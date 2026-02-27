@@ -35,7 +35,7 @@ const BlogTitles = () => {
     const prompt = `Generate a blog title for the keyword ${input} in the category ${selectedCategory}`;
 
     const { data } = await axios.post(
-      "/generate-blog-title",
+      "/api/ai/generate-blog-title",
       { prompt },
       {
         headers: {

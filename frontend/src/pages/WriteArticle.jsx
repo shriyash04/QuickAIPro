@@ -27,9 +27,8 @@ const WriteArticle = () => {
     setLoading(true);
 
     const prompt = `Write an article about ${input} in ${selectedLength.text}`;
-
     const { data } = await axios.post(
-      "/generate-article",
+      "/api/ai/generate-article",
       { prompt, length: selectedLength.length },
       {
         headers: {

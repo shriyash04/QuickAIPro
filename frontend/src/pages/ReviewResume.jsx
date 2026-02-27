@@ -23,7 +23,7 @@ const ReviewResume = () => {
 
     // ✅ Gemini resume review expects TEXT, not file
     const { data } = await axios.post(
-      "/review-resume-text",
+      "/api/ai/review-resume-text",
       { resume: input }, // input = pasted resume text
       {
         headers: {
