@@ -24,6 +24,8 @@ app.use(
     origin: (process.env.CLIENT_URL || "http://localhost:5173")
       .split(",")
       .map((s) => s.trim()),
+       methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
