@@ -76,7 +76,40 @@ async function generateBlogTitle(req, res) {
   }
 }
 
-// ================= IMAGE PROMPT =================
+// // ================= IMAGE PROMPT =================
+// async function generateImage(req, res) {
+//   try {
+//     const userId = req.userId;
+//     const idea = String(req.body?.prompt || req.body?.description || "").trim();
+
+//     if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
+//     if (!idea) return res.status(400).json({ success: false, message: "Prompt required" });
+
+//     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+//     const result = await model.generateContent(
+//       `Create a detailed AI image generation prompt including subject, style, lighting, camera angle, and environment:\n${idea}`
+//     );
+
+//     const imagePrompt = result.response.text();
+
+//     await Creation.create({
+//       userId,
+//       type: "image-prompt",
+//       prompt: idea,
+//       content: imagePrompt,
+//       publish: false,
+//     });
+
+//     return res.json({ success: true, data: { prompt: imagePrompt } });
+//   } catch (err) {
+//     console.error("generateImage ERROR:", err.message);
+//     return res.status(500).json({ success: false, message: "Image prompt generation failed" });
+//   }
+// }
+
+
+// ================= IMAGE GENERATION =================
 async function generateImage(req, res) {
   try {
     const userId = req.userId;
@@ -87,24 +120,41 @@ async function generateImage(req, res) {
 
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
+    // STEP 1: Generate detailed prompt using Gemini
     const result = await model.generateContent(
       `Create a detailed AI image generation prompt including subject, style, lighting, camera angle, and environment:\n${idea}`
     );
 
-    const imagePrompt = result.response.text();
+    const imagePrompt = result.response.text().trim();
 
+    // STEP 2: Encode prompt for URL
+    const encodedPrompt = encodeURIComponent(imagePrompt);
+
+    // STEP 3: Create Pollinations Image URL
+    const imageUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&width=1024&height=1024&key=${process.env.POLLINATIONS_API_KEY}`;
+
+    // STEP 4: Save to DB
     await Creation.create({
       userId,
-      type: "image-prompt",
+      type: "image",
       prompt: idea,
       content: imagePrompt,
+      imageUrl: imageUrl,
       publish: false,
     });
 
-    return res.json({ success: true, data: { prompt: imagePrompt } });
+    // STEP 5: Return response
+    return res.json({
+      success: true,
+      data: {
+        prompt: imagePrompt,
+        imageUrl: imageUrl,
+      },
+    });
+
   } catch (err) {
     console.error("generateImage ERROR:", err.message);
-    return res.status(500).json({ success: false, message: "Image prompt generation failed" });
+    return res.status(500).json({ success: false, message: "Image generation failed" });
   }
 }
 

@@ -41,7 +41,7 @@ const GenerateImages = () => {
       );
 
       if (data.success) {
-        setContent(data.content);
+        setContent(data.data.imageUrl);
       } else {
         toast.error(data.message);
       }
