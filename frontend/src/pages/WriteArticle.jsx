@@ -120,7 +120,7 @@ const WriteArticle = () => {
             </div>
           </div>
         ) : (
-          <div className="mt-3 h-full overflow-y-scroll text-sm text-slate-600">
+          <div className="mt-3 flex-1 overflow-y-auto text-sm text-slate-600 pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
             <div className="reset-tw">
               <Markdown>{content}</Markdown>
             </div>
