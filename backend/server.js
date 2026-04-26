@@ -25,7 +25,7 @@ app.use(
       .split(",")
       .map((s) => s.trim()),
        methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-user-id"],
     credentials: true,
   })
 );
