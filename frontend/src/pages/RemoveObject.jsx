@@ -30,18 +30,24 @@ const RemoveObject = () => {
       formData.append("object", object);
 
       const { data } = await axios.post(
-        "/api/ai/remove-image-object",
+        "/api/ai/remove-object",
         formData,
-        { headers: { Authorization: `Bearer ${await getToken()}` } }
+        { 
+          headers: { 
+            "x-user-id": "test_user_1",
+            "Content-Type": "multipart/form-data"
+          } 
+        }
       );
 
-      if (data.success) {
-        setContent(data.content);
+      if (data?.success) {
+        setContent(data?.data?.imageUrl || data?.content);
+        toast.success("Object removed successfully!");
       } else {
-        toast.error(data.message);
+        toast.error(data?.message || "Object removal failed");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || error?.message || "Request failed");
     }
 
     setLoading(false);

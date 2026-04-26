@@ -37,16 +37,22 @@ const GenerateImages = () => {
       const { data } = await axios.post(
         "/api/ai/generate-image",
         { prompt, publish },
-        { headers: { Authorization: `Bearer ${await getToken()}` } }
+        { 
+          headers: { 
+            "x-user-id": "test_user_1",
+            "Content-Type": "application/json"
+          } 
+        }
       );
 
       if (data.success) {
         setContent(data.data.imageUrl);
+        toast.success("Image generated successfully!");
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || error.message);
     }
 
     setLoading(false);

@@ -23,18 +23,24 @@ const RemoveBackground = () => {
       formData.append("image", input);
 
       const { data } = await axios.post(
-        "/api/ai/remove-image-background",
+        "/api/ai/remove-background",
         formData,
-        { headers: { Authorization: `Bearer ${await getToken()}` } }
+        { 
+          headers: { 
+            "x-user-id": "test_user_1",
+            "Content-Type": "multipart/form-data"
+          } 
+        }
       );
 
-      if (data.success) {
-        setContent(data.content);
+      if (data?.success) {
+        setContent(data?.data?.imageUrl || data?.content);
+        toast.success("Background removed successfully!");
       } else {
-        toast.error(data.message);
+        toast.error(data?.message || "Background removal failed");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || error?.message || "Request failed");
     }
 
     setLoading(false);
