@@ -49,4 +49,7 @@ router.post("/remove-background", requireAuth, aiLimiter, uploadImage.single("im
 
 router.post("/review-resume", requireAuth, aiLimiter, uploadPDF.single("file"), aiController.resumeReview);
 
+// ✅ TEXT-BASED RESUME REVIEW (no file upload needed)
+router.post("/review-resume-text", requireAuth, aiLimiter, aiController.resumeReview);
+
 module.exports = router;

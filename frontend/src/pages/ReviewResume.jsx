@@ -8,8 +8,7 @@ import Markdown from "react-markdown";
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const ReviewResume = () => {
-  const [input, setInput] = useState("");
-
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
@@ -21,27 +20,45 @@ const ReviewResume = () => {
   try {
     setLoading(true);
 
-    // ✅ Gemini resume review expects TEXT, not file
-    const { data } = await axios.post(
-      "/api/ai/review-resume-text",
-      { resume: input }, // input = pasted resume text
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": "test_user_1", // match backend auth
-        },
-      }
-    );
-
-    if (data?.success) {
-      // ✅ backend returns { data: { review } }
-      setContent(data?.data?.review || "");
-    } else {
-      toast.error(data?.message || "Resume review failed");
+    // ✅ Read PDF file as text using FileReader
+    if (!file) {
+      toast.error("Please select a PDF file");
+      setLoading(false);
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const resumeText = event.target.result; // PDF as text
+
+        const { data } = await axios.post(
+          "/api/ai/review-resume-text",
+          { resume: resumeText },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-user-id": "test_user_1",
+            },
+          }
+        );
+
+        if (data?.success) {
+          setContent(data?.data?.review || "");
+          toast.success("Resume reviewed successfully!");
+        } else {
+          toast.error(data?.message || "Resume review failed");
+        }
+      } catch (error) {
+        toast.error(error?.response?.data?.message || error?.message || "Request failed");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    reader.readAsText(file); // Read file as text
   } catch (error) {
     toast.error(error?.response?.data?.message || error?.message || "Request failed");
-  } finally {
     setLoading(false);
   }
 };
@@ -61,7 +78,7 @@ const ReviewResume = () => {
         <p className="mt-6 text-sm font-medium">Upload Resume</p>
 
         <input
-          onChange={(e) => setInput(e.target.files[0])}
+          onChange={(e) => setFile(e.target.files[0])}
           type="file"
           accept="application/pdf"
           className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300 text-gray-600"
