@@ -7,7 +7,8 @@ import WriteArticle from "./pages/WriteArticle";
 import BlogTitles from "./pages/BlogTitles";
 import GenerateImages from "./pages/GenerateImages";
 import ImageGeneration from "./pages/ImageGeneration";
-
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminPanel from "./pages/AdminPanel";
 
 
 // ...other pages
@@ -65,6 +66,25 @@ export default function AnimatedRoutes() {
             </motion.div>
           }
         />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <motion.div {...page}>
+              <AdminDashboard />
+            </motion.div>
+          }
+        />
+        <Route
+          path="/admin/panel"
+          element={
+            <motion.div {...page}>
+              <AdminPanel />
+            </motion.div>
+          }
+        />
+
         {/* add other routes same way */}
       </Routes>
     </AnimatePresence>

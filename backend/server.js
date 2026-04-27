@@ -11,6 +11,7 @@ const connectDB = require("./db/connect");
 const aiRoutes = require("./routes/aiRoutes");
 const userRoutes = require("./routes/userRoutes");
 const promptRoutes = require("./routes/promptRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.get("/health", (_, res) => res.json({ ok: true }));
 app.use("/api/ai", aiRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/prompts", promptRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = Number(process.env.PORT || 8081);
 
