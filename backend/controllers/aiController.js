@@ -109,7 +109,7 @@ async function generateBlogTitle(req, res) {
 // }
 
 
-// ================= IMAGE GENERATION =================
+// ================= IMAGE GENERATION (INFIP API) =================
 async function generateImage(req, res) {
   try {
     const userId = req.userId;
@@ -127,13 +127,36 @@ async function generateImage(req, res) {
 
     const imagePrompt = result.response.text().trim();
 
-    // STEP 2: Encode prompt for URL
-    const encodedPrompt = encodeURIComponent(imagePrompt);
+    // STEP 2: Call Infip API for image generation
+    const infipResponse = await fetch("https://api.infip.pro/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.INFIP_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "img4",
+        prompt: imagePrompt,
+        n: 1,
+        size: "1024x1024",
+        response_format: "url",
+      }),
+    });
 
-    // STEP 3: Create Pollinations Image URL
-    const imageUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&width=1024&height=1024&key=${process.env.POLLINATIONS_API_KEY}`;
+    if (!infipResponse.ok) {
+      const errorData = await infipResponse.json();
+      console.error("Infip API Error:", errorData);
+      return res.status(infipResponse.status).json({
+        success: false,
+        message: "Image generation failed",
+        error: errorData,
+      });
+    }
 
-    // STEP 4: Save to DB
+    const infipData = await infipResponse.json();
+    const imageUrl = infipData.data[0].url;
+
+    // STEP 3: Save to DB
     await Creation.create({
       userId,
       type: "image",
@@ -143,7 +166,7 @@ async function generateImage(req, res) {
       publish: false,
     });
 
-    // STEP 5: Return response
+    // STEP 4: Return response
     return res.json({
       success: true,
       data: {
